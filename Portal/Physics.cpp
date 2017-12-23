@@ -28,6 +28,10 @@ Physics::Physics(string const &path, glm::vec3 up) {
 			for (int i = 0; i < 3; ++i) {
 				inFile >> n[i];
 			}
+			char tCh;
+			inFile >> tCh;
+			int textureId = 0;
+			inFile >> textureId;
 			if (n[0] == 0 && n[1] == 0) {
 				vector<pair<double, double>> plane;
 				for (int i = 0; i < 4; ++i) {
@@ -81,7 +85,7 @@ void Physics::updateVerticleState(double &v, glm::vec3 &pos, double deltaTime, b
 	v = v_;
 }
 
-bool Physics::isHorizontalAvailable(glm::vec3 pos, glm::vec3 movement) {
+bool Physics::isHorizontalAvailable(glm::vec3 &pos, glm::vec3 movement) {
 	glm::vec3 pos_ = pos + movement;
 	double movementX = movement.x;
 	double movementY = movement.y;

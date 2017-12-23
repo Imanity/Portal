@@ -157,6 +157,8 @@
   <ItemGroup>
     <None Include="shader.fs" />
     <None Include="shader.vs" />
+    <None Include="shader_cross.fs" />
+    <None Include="shader_cross.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -167,6 +169,8 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Map1.txt" />
+    <Text Include="Map2.txt" />
+    <Text Include="Map_cross.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

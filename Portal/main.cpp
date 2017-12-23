@@ -17,19 +17,16 @@ void processInput(GLFWwindow *window);
 void glInitialize();
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1366;
+const unsigned int SCR_HEIGHT = 768;
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+Camera camera(glm::vec3(8.0f, 8.0f, 2.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
 bool firstMouse = true;
 
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
-
-// lighting
-glm::vec3 lightPos(0.0f, 0.0f, 50.0f);
 
 // timing
 float deltaTime = 0.0f;
@@ -38,7 +35,7 @@ float lastFrame = 0.0f;
 // For Physics Engine
 double verticleSpeed = 0;
 bool isJumping = false;
-Physics physics("Map1.txt", glm::vec3(0.0f, 0.0f, 1.0f));
+Physics physics("Map2.txt", glm::vec3(0.0f, 0.0f, 1.0f));
 glm::vec3 playerSize = glm::vec3(0.0f, 0.0f, 2.0f);
 glm::vec3 playerPos;
 
@@ -72,8 +69,10 @@ int main() {
 	glEnable(GL_DEPTH_TEST);
 
 	Shader shader("shader.vs", "shader.fs");
+	Shader shaderCross("shader_cross.vs", "shader_cross.fs");
 
-	Model scene("Map1.txt");
+	Model scene("Map2.txt");
+	Model crossHairs("Map_cross.txt");
 
 	// render loop
 	// -----------
@@ -101,19 +100,6 @@ int main() {
 
 		// draw
 		shader.use();
-		shader.setVec3("light.position", lightPos);
-		shader.setVec3("viewPos", camera.Position);
-
-		// light properties
-		glm::vec3 lightColor;
-		lightColor.x = 1.0f;
-		lightColor.y = 1.0f;
-		lightColor.z = 1.0f;
-		glm::vec3 diffuseColor = lightColor   * glm::vec3(0.5f);
-		glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
-		shader.setVec3("light.ambient", ambientColor);
-		shader.setVec3("light.diffuse", diffuseColor);
-		shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
 		// view/projection transformations
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -133,6 +119,10 @@ int main() {
 		// render the model
 		shader.setMat4("model", model);
 		scene.Draw(shader);
+
+		// draw cross
+		shaderCross.use();
+		crossHairs.Draw(shaderCross);
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
@@ -156,25 +146,25 @@ void processInput(GLFWwindow *window) {
 		glfwSetWindowShouldClose(window, true);
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		glm::vec3 movement = glm::normalize(camera.Front - camera.WorldUp * (camera.Front * camera.WorldUp)) * camera.MovementSpeed * deltaTime;
+		glm::vec3 movement = glm::normalize(camera.Front - camera.WorldUp * (camera.Front * camera.WorldUp)) * camera.MovementSpeed * deltaTime * 35.0f;
 		if (physics.isHorizontalAvailable(camera.Position, movement)) {
 			camera.ProcessKeyboard(FORWARD, deltaTime);
 		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		glm::vec3 movement = glm::normalize(camera.Front - camera.WorldUp * (camera.Front * camera.WorldUp)) * camera.MovementSpeed * deltaTime * -1.0f;
+		glm::vec3 movement = glm::normalize(camera.Front - camera.WorldUp * (camera.Front * camera.WorldUp)) * camera.MovementSpeed * deltaTime * -35.0f;
 		if (physics.isHorizontalAvailable(camera.Position, movement)) {
 			camera.ProcessKeyboard(BACKWARD, deltaTime);
 		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		glm::vec3 movement = glm::normalize(camera.Right - camera.WorldUp * (camera.Right * camera.WorldUp)) * camera.MovementSpeed * deltaTime * -1.0f;
+		glm::vec3 movement = glm::normalize(camera.Right - camera.WorldUp * (camera.Right * camera.WorldUp)) * camera.MovementSpeed * deltaTime * -35.0f;
 		if (physics.isHorizontalAvailable(camera.Position, movement)) {
 			camera.ProcessKeyboard(LEFT, deltaTime);
 		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		glm::vec3 movement = glm::normalize(camera.Right - camera.WorldUp * (camera.Right * camera.WorldUp)) * camera.MovementSpeed * deltaTime;
+		glm::vec3 movement = glm::normalize(camera.Right - camera.WorldUp * (camera.Right * camera.WorldUp)) * camera.MovementSpeed * deltaTime * 35.0f;
 		if (physics.isHorizontalAvailable(camera.Position, movement)) {
 			camera.ProcessKeyboard(RIGHT, deltaTime);
 		}

@@ -53,6 +53,12 @@
     <None Include="shader.vs">
       <Filter>源文件\Shader</Filter>
     </None>
+    <None Include="shader_cross.fs">
+      <Filter>源文件\Shader</Filter>
+    </None>
+    <None Include="shader_cross.vs">
+      <Filter>源文件\Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -73,6 +79,12 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Map1.txt">
+      <Filter>资源文件\Maps</Filter>
+    </Text>
+    <Text Include="Map2.txt">
+      <Filter>资源文件\Maps</Filter>
+    </Text>
+    <Text Include="Map_cross.txt">
       <Filter>资源文件\Maps</Filter>
     </Text>
   </ItemGroup>

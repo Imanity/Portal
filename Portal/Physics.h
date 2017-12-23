@@ -26,7 +26,7 @@ public:
 	~Physics();
 
 	void updateVerticleState(double &v, glm::vec3 &pos, double deltaTime, bool &isJumping);
-	bool isHorizontalAvailable(glm::vec3 pos, glm::vec3 movement);
+	bool isHorizontalAvailable(glm::vec3 &pos, glm::vec3 movement);
 
 private:
 	bool isInPolygon(pair<double, double> pos, vector<pair<double, double>> polygon);

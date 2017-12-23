@@ -194,10 +194,12 @@ void Model::loadMap(string const &path) {
 		std::cout << "Map failed to load at path: " << path << std::endl;
 		return;
 	}
-	int id = 0;
-	vector<Vertex> vertices;
-	vector<unsigned int> indices;
-	vector<Texture> textures;
+	int id[7] = { 0, 0, 0, 0, 0, 0, 0 };
+	vector<Vertex> vertices[7];
+	vector<unsigned int> indices[7];
+	vector<Texture> textures[7];
+	float textureWidth[7] = { 650, 357, 640, 447, 429, 980, 640 };
+	float textureHeight[7] = { 613, 357, 480, 783, 729, 653, 490 };
 	while (true) {
 		if (inFile.eof()) {
 			break;
@@ -219,9 +221,33 @@ void Model::loadMap(string const &path) {
 			for (int i = 0; i < 3; ++i) {
 				inFile >> n[i];
 			}
+			char tCh;
+			inFile >> tCh;
+			int textureId = 0;
+			inFile >> textureId;
 			int order[] = { 0, 1, 2, 0, 2, 3 };
 			for (int i = 0; i < 4; ++i) {
 				Vertex v;
+				float texCorWidth = 300.0f * (textureId == 1 ? 1.0f : 1.0f) * sqrt(pow(p[1][0] - p[0][0], 2) + pow(p[1][1] - p[0][1], 2) + pow(p[1][2] - p[0][2], 2));
+				float texCorHeight = 300.0f * (textureId == 1 ? 1.0f : 1.0f) * sqrt(pow(p[1][0] - p[2][0], 2) + pow(p[1][1] - p[2][1], 2) + pow(p[1][2] - p[2][2], 2));
+				float texX = texCorWidth / textureWidth[textureId - 1];
+				float texY = texCorHeight / textureHeight[textureId - 1];
+				switch (i) {
+				case 0:
+					v.TexCoords = glm::vec2(0.0f, 0.0f);
+					break;
+				case 1:
+					v.TexCoords = glm::vec2(texX, 0.0f);
+					break;
+				case 2:
+					v.TexCoords = glm::vec2(texX, texY);
+					break;
+				case 3:
+					v.TexCoords = glm::vec2(0.0f, texY);
+					break;
+				default:
+					break;
+				}
 				glm::vec3 vector;
 				vector.x = p[i][0];
 				vector.y = p[i][1];
@@ -231,18 +257,49 @@ void Model::loadMap(string const &path) {
 				vector.y = n[1];
 				vector.z = n[2];
 				v.Normal = vector;
-				vertices.push_back(v);
+				vertices[textureId - 1].push_back(v);
 			}
 			for (int i = 0; i < 6; ++i) {
-				indices.push_back(id + order[i]);
+				indices[textureId - 1].push_back(id[textureId - 1] + order[i]);
 			}
-			id += 4;
+			id[textureId - 1] += 4;
 		}
 		else {
 			break;
 		}
 	}
+	Texture tmpTexture;
+	tmpTexture.id = TextureFromFile("wall_v_1.png", "Textures/");
+	tmpTexture.path = "wall_v_1.png";
+	tmpTexture.type = "texture_diffuse";
+	textures[0].push_back(tmpTexture);
+	tmpTexture.id = TextureFromFile("wall_v_2.png", "Textures/");
+	tmpTexture.path = "wall_v_2.png";
+	tmpTexture.type = "texture_diffuse";
+	textures[1].push_back(tmpTexture);
+	tmpTexture.id = TextureFromFile("wall_w_2.jpg", "Textures/");
+	tmpTexture.path = "wall_w_2.jpg";
+	tmpTexture.type = "texture_diffuse";
+	textures[2].push_back(tmpTexture);
+	tmpTexture.id = TextureFromFile("blue_portal.png", "Textures/");
+	tmpTexture.path = "blue_portal.png";
+	tmpTexture.type = "texture_diffuse";
+	textures[3].push_back(tmpTexture);
+	tmpTexture.id = TextureFromFile("orange_portal.png", "Textures/");
+	tmpTexture.path = "orange_portal.png";
+	tmpTexture.type = "texture_diffuse";
+	textures[4].push_back(tmpTexture);
+	tmpTexture.id = TextureFromFile("ceil_2.jpg", "Textures/");
+	tmpTexture.path = "ceil_2.jpg";
+	tmpTexture.type = "texture_diffuse";
+	textures[5].push_back(tmpTexture);
+	tmpTexture.id = TextureFromFile("pillar_1.png", "Textures/");
+	tmpTexture.path = "pillar_1.png";
+	tmpTexture.type = "texture_diffuse";
+	textures[6].push_back(tmpTexture);
 	inFile.close();
-	Mesh mesh(vertices, indices, textures);
-	meshes.push_back(mesh);
+	for (int i = 0; i < 7; ++i) {
+		Mesh mesh(vertices[i], indices[i], textures[i]);
+		meshes.push_back(mesh);
+	}
 }
