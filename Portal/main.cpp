@@ -9,6 +9,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Model.h"
+#include "Physics.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -33,6 +34,13 @@ glm::vec3 lightPos(0.0f, 0.0f, 50.0f);
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
+// For Physics Engine
+double verticleSpeed = 0;
+bool isJumping = false;
+Physics physics("Map1.txt", glm::vec3(0.0f, 0.0f, 1.0f));
+glm::vec3 playerSize = glm::vec3(0.0f, 0.0f, 2.0f);
+glm::vec3 playerPos;
 
 int main() {
 	glInitialize();
@@ -75,6 +83,12 @@ int main() {
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
+
+		// Update state
+		// ------
+		playerPos = camera.Position - playerSize;
+		physics.updateVerticleState(verticleSpeed, playerPos, deltaTime, isJumping);
+		camera.Position = playerSize + playerPos;
 
 		// input
 		// -----
@@ -141,14 +155,35 @@ void processInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera.ProcessKeyboard(FORWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera.ProcessKeyboard(BACKWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera.ProcessKeyboard(LEFT, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera.ProcessKeyboard(RIGHT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		glm::vec3 movement = glm::normalize(camera.Front - camera.WorldUp * (camera.Front * camera.WorldUp)) * camera.MovementSpeed * deltaTime;
+		if (physics.isHorizontalAvailable(camera.Position, movement)) {
+			camera.ProcessKeyboard(FORWARD, deltaTime);
+		}
+	}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		glm::vec3 movement = glm::normalize(camera.Front - camera.WorldUp * (camera.Front * camera.WorldUp)) * camera.MovementSpeed * deltaTime * -1.0f;
+		if (physics.isHorizontalAvailable(camera.Position, movement)) {
+			camera.ProcessKeyboard(BACKWARD, deltaTime);
+		}
+	}
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		glm::vec3 movement = glm::normalize(camera.Right - camera.WorldUp * (camera.Right * camera.WorldUp)) * camera.MovementSpeed * deltaTime * -1.0f;
+		if (physics.isHorizontalAvailable(camera.Position, movement)) {
+			camera.ProcessKeyboard(LEFT, deltaTime);
+		}
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		glm::vec3 movement = glm::normalize(camera.Right - camera.WorldUp * (camera.Right * camera.WorldUp)) * camera.MovementSpeed * deltaTime;
+		if (physics.isHorizontalAvailable(camera.Position, movement)) {
+			camera.ProcessKeyboard(RIGHT, deltaTime);
+		}
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !isJumping) {
+		verticleSpeed = -8.0;
+		isJumping = true;
+	}
 }
 
 // glfw: whenever the mouse moves, this callback is called

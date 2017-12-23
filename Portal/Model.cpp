@@ -206,6 +206,9 @@ void Model::loadMap(string const &path) {
 		inFile >> type;
 		if (type == 'R') {
 			double p[4][3], n[3];
+			if (inFile.eof()) {
+				break;
+			}
 			for (int i = 0; i < 4; ++i) {
 				for (int j = 0; j < 3; ++j) {
 					inFile >> p[i][j];
@@ -239,6 +242,7 @@ void Model::loadMap(string const &path) {
 			break;
 		}
 	}
+	inFile.close();
 	Mesh mesh(vertices, indices, textures);
 	meshes.push_back(mesh);
 }
