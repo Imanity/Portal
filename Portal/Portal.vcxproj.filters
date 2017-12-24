@@ -45,6 +45,9 @@
     <ClCompile Include="Physics.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Portal.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader.fs">
@@ -57,6 +60,12 @@
       <Filter>源文件\Shader</Filter>
     </None>
     <None Include="shader_cross.vs">
+      <Filter>源文件\Shader</Filter>
+    </None>
+    <None Include="shader_portal.fs">
+      <Filter>源文件\Shader</Filter>
+    </None>
+    <None Include="shader_portal.vs">
       <Filter>源文件\Shader</Filter>
     </None>
   </ItemGroup>
@@ -74,6 +83,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Physics.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Portal.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

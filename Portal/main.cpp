@@ -10,15 +10,17 @@
 #include "Camera.h"
 #include "Model.h"
 #include "Physics.h"
+#include "Portal.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void processInput(GLFWwindow *window);
 void glInitialize();
 
 // settings
-const unsigned int SCR_WIDTH = 1366;
-const unsigned int SCR_HEIGHT = 768;
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
 
 // camera
 Camera camera(glm::vec3(8.0f, 8.0f, 2.0f), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -33,11 +35,16 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 // For Physics Engine
-double verticleSpeed = 0;
+// double verticleSpeed = 0;
+glm::vec3 speed = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 keyboardSpeed = glm::vec3(0.0f, 0.0f, 0.0f);
 bool isJumping = false;
 Physics physics("Map2.txt", glm::vec3(0.0f, 0.0f, 1.0f));
 glm::vec3 playerSize = glm::vec3(0.0f, 0.0f, 2.0f);
-glm::vec3 playerPos;
+glm::vec3 playerPos, cameraPos;
+
+// Portal
+Portal portal;
 
 int main() {
 	glInitialize();
@@ -53,6 +60,7 @@ int main() {
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
 
 	// tell GLFW to capture our mouse
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -70,9 +78,12 @@ int main() {
 
 	Shader shader("shader.vs", "shader.fs");
 	Shader shaderCross("shader_cross.vs", "shader_cross.fs");
+	Shader shaderPortal("shader_portal.vs", "shader_portal.fs");
 
 	Model scene("Map2.txt");
 	Model crossHairs("Map_cross.txt");
+	
+	portal.initialize();
 
 	// render loop
 	// -----------
@@ -86,43 +97,49 @@ int main() {
 		// Update state
 		// ------
 		playerPos = camera.Position - playerSize;
-		physics.updateVerticleState(verticleSpeed, playerPos, deltaTime, isJumping);
+		physics.updateVerticleState(speed, playerPos, deltaTime, isJumping);
 		camera.Position = playerSize + playerPos;
+		
+		cameraPos = camera.Position;
+		bool isPass = false;
+		glm::vec3 cameraFront = camera.Front;
+		float rotateAngle = portal.passPortal(cameraPos, speed, keyboardSpeed, cameraFront, deltaTime, isPass);
+		camera.ProcessMouseMovement(rotateAngle * 10.0f * 180.0f / 3.1416f, 0.0f);
+		camera.Position = cameraPos;
 
 		// input
 		// -----
-		processInput(window);
+		keyboardSpeed = glm::vec3(0.0f, 0.0f, 0.0f);
+		if (!isPass)
+			processInput(window);
 
 		// render
 		// ------
 		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// draw
-		shader.use();
-
 		// view/projection transformations
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 		glm::mat4 view = camera.GetViewMatrix();
-		shader.setMat4("projection", projection);
-		shader.setMat4("view", view);
-
-		// world transformation
 		glm::mat4 model;
-		shader.setMat4("model", model);
-
-		shader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
-		shader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
-		shader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
-		shader.setFloat("material.shininess", 32.0f);
 
 		// render the model
+		shader.use();
+		shader.setMat4("projection", projection);
+		shader.setMat4("view", view);
 		shader.setMat4("model", model);
 		scene.Draw(shader);
 
 		// draw cross
 		shaderCross.use();
 		crossHairs.Draw(shaderCross);
+
+		// draw portal
+		shaderPortal.use();
+		shaderPortal.setMat4("projection", projection);
+		shaderPortal.setMat4("view", view);
+		shaderPortal.setMat4("model", model);
+		portal.Draw(shaderPortal);
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
@@ -145,33 +162,38 @@ void processInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
+	keyboardSpeed = glm::vec3(0.0f, 0.0f, 0.0f);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		glm::vec3 movement = glm::normalize(camera.Front - camera.WorldUp * (camera.Front * camera.WorldUp)) * camera.MovementSpeed * deltaTime * 35.0f;
 		if (physics.isHorizontalAvailable(camera.Position, movement)) {
 			camera.ProcessKeyboard(FORWARD, deltaTime);
+			keyboardSpeed += movement;
 		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		glm::vec3 movement = glm::normalize(camera.Front - camera.WorldUp * (camera.Front * camera.WorldUp)) * camera.MovementSpeed * deltaTime * -35.0f;
 		if (physics.isHorizontalAvailable(camera.Position, movement)) {
 			camera.ProcessKeyboard(BACKWARD, deltaTime);
+			keyboardSpeed += movement;
 		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 		glm::vec3 movement = glm::normalize(camera.Right - camera.WorldUp * (camera.Right * camera.WorldUp)) * camera.MovementSpeed * deltaTime * -35.0f;
 		if (physics.isHorizontalAvailable(camera.Position, movement)) {
 			camera.ProcessKeyboard(LEFT, deltaTime);
+			keyboardSpeed += movement;
 		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		glm::vec3 movement = glm::normalize(camera.Right - camera.WorldUp * (camera.Right * camera.WorldUp)) * camera.MovementSpeed * deltaTime * 35.0f;
 		if (physics.isHorizontalAvailable(camera.Position, movement)) {
 			camera.ProcessKeyboard(RIGHT, deltaTime);
+			keyboardSpeed += movement;
 		}
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !isJumping) {
-		verticleSpeed = -8.0;
+		speed.z = -8.0f;
 		isJumping = true;
 	}
 }
@@ -192,6 +214,21 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	lastY = ypos;
 
 	camera.ProcessMouseMovement(xoffset, yoffset);
+}
+
+// glfw: whenever the mouse clicked, this callback is called
+// -------------------------------------------------------
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+	if (action == GLFW_PRESS) {
+		int whichButton = (button == GLFW_MOUSE_BUTTON_RIGHT);
+		bool isIntersected;
+		glm::vec3 pos, n, up;
+		isIntersected = physics.isIntersected(camera.Position, camera.Front, pos, n, up);
+		// portal.setPortal(whichButton, glm::vec3(15.0f, 9.0f, 7.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		if (isIntersected) {
+			portal.setPortal(whichButton, pos, n, up);
+		}
+	}
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

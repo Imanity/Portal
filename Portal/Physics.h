@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <climits>
 
 using namespace std;
 
@@ -20,17 +21,20 @@ private:
 	vector<pair<vector<pair<double, double>>, double>> yPlanes;
 	vector<pair<vector<pair<double, double>>, double>> zPlanes;
 	glm::vec3 worldUp;
+	vector<pair<int, int>> whiteWalls;
 
 public:
 	Physics(string const &path, glm::vec3 up);
 	~Physics();
 
-	void updateVerticleState(double &v, glm::vec3 &pos, double deltaTime, bool &isJumping);
+	void updateVerticleState(glm::vec3 &v, glm::vec3 &pos, double deltaTime, bool &isJumping);
 	bool isHorizontalAvailable(glm::vec3 &pos, glm::vec3 movement);
+	bool isIntersected(glm::vec3 playerPos, glm::vec3 lookat, glm::vec3 &pos, glm::vec3 &n, glm::vec3 &up);
 
 private:
 	bool isInPolygon(pair<double, double> pos, vector<pair<double, double>> polygon);
 	double angleBetween(double x1, double y1, double x2, double y2);
+	bool isWallWhite(int x, int y);
 };
 
 #endif // PHSICS_H
