@@ -29,6 +29,7 @@ public:
 	/*  Model Data */
 	vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
 	vector<Mesh> meshes;
+	vector<Mesh> singleMeshes;
 	string directory;
 	bool gammaCorrection;
 
@@ -38,6 +39,7 @@ public:
 
 	// draws the model, and thus all its meshes
 	void Draw(Shader shader);
+	void DrawExcept(Shader shader, glm::vec3 pos, glm::vec3 n);
 
 private:
 	/*  Functions   */

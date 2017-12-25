@@ -68,6 +68,18 @@
     <None Include="shader_portal.vs">
       <Filter>源文件\Shader</Filter>
     </None>
+    <None Include="shader_portal_inside.fs">
+      <Filter>源文件\Shader</Filter>
+    </None>
+    <None Include="shader_portal_inside.vs">
+      <Filter>源文件\Shader</Filter>
+    </None>
+    <None Include="shader_portal_mask.fs">
+      <Filter>源文件\Shader</Filter>
+    </None>
+    <None Include="shader_portal_mask.vs">
+      <Filter>源文件\Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">

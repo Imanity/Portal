@@ -47,6 +47,20 @@ void Model::Draw(Shader shader) {
 		meshes[i].Draw(shader);
 }
 
+void Model::DrawExcept(Shader shader, glm::vec3 pos, glm::vec3 n) {
+	for (unsigned int i = 0; i < singleMeshes.size(); i++) {
+		Vertex v = singleMeshes[i].vertices[0];
+		if (abs(v.Normal.x) == abs(n.x) && abs(v.Normal.y) == abs(n.y) && (
+			(n.x == 1.0f && v.Position.x < pos.x + 1.0f) || 
+			(n.x == -1.0f && v.Position.x > pos.x - 1.0f) ||
+			(n.y == 1.0f && v.Position.y < pos.y + 1.0f) || 
+			(n.y == -1.0f && v.Position.y > pos.y - 1.0f))) {
+			continue;
+		}
+		singleMeshes[i].Draw(shader);
+	}
+}
+
 void Model::loadModel(string const &path) {
 	// read file via ASSIMP
 	Assimp::Importer importer;
@@ -77,7 +91,6 @@ void Model::processNode(aiNode *node, const aiScene *scene) {
 	for (unsigned int i = 0; i < node->mNumChildren; i++) {
 		processNode(node->mChildren[i], scene);
 	}
-
 }
 
 Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
@@ -200,6 +213,7 @@ void Model::loadMap(string const &path) {
 	vector<Texture> textures[7];
 	float textureWidth[7] = { 650, 357, 640, 447, 429, 980, 640 };
 	float textureHeight[7] = { 613, 357, 480, 783, 729, 653, 490 };
+	string textureNames[7] = { "wall_v_1.png", "wall_v_2.png", "wall_w_2.jpg", "blue_portal.png", "orange_portal.png", "ceil_2.jpg", "pillar_1.png" };
 	while (true) {
 		if (inFile.eof()) {
 			break;
@@ -207,6 +221,9 @@ void Model::loadMap(string const &path) {
 		char type;
 		inFile >> type;
 		if (type == 'R') {
+			vector<Vertex> vertices_;
+			vector<unsigned int> indices_;
+			vector<Texture> textures_;
 			double p[4][3], n[3];
 			if (inFile.eof()) {
 				break;
@@ -258,10 +275,19 @@ void Model::loadMap(string const &path) {
 				vector.z = n[2];
 				v.Normal = vector;
 				vertices[textureId - 1].push_back(v);
+				vertices_.push_back(v);
 			}
 			for (int i = 0; i < 6; ++i) {
 				indices[textureId - 1].push_back(id[textureId - 1] + order[i]);
+				indices_.push_back(order[i]);
 			}
+			Texture tmpTexture;
+			tmpTexture.id = TextureFromFile(textureNames[textureId - 1].c_str(), "Textures/");
+			tmpTexture.path = textureNames[textureId - 1].c_str();
+			tmpTexture.type = "texture_diffuse";
+			textures_.push_back(tmpTexture);
+			Mesh m(vertices_, indices_, textures_);
+			singleMeshes.push_back(m);
 			id[textureId - 1] += 4;
 		}
 		else {
@@ -269,34 +295,12 @@ void Model::loadMap(string const &path) {
 		}
 	}
 	Texture tmpTexture;
-	tmpTexture.id = TextureFromFile("wall_v_1.png", "Textures/");
-	tmpTexture.path = "wall_v_1.png";
-	tmpTexture.type = "texture_diffuse";
-	textures[0].push_back(tmpTexture);
-	tmpTexture.id = TextureFromFile("wall_v_2.png", "Textures/");
-	tmpTexture.path = "wall_v_2.png";
-	tmpTexture.type = "texture_diffuse";
-	textures[1].push_back(tmpTexture);
-	tmpTexture.id = TextureFromFile("wall_w_2.jpg", "Textures/");
-	tmpTexture.path = "wall_w_2.jpg";
-	tmpTexture.type = "texture_diffuse";
-	textures[2].push_back(tmpTexture);
-	tmpTexture.id = TextureFromFile("blue_portal.png", "Textures/");
-	tmpTexture.path = "blue_portal.png";
-	tmpTexture.type = "texture_diffuse";
-	textures[3].push_back(tmpTexture);
-	tmpTexture.id = TextureFromFile("orange_portal.png", "Textures/");
-	tmpTexture.path = "orange_portal.png";
-	tmpTexture.type = "texture_diffuse";
-	textures[4].push_back(tmpTexture);
-	tmpTexture.id = TextureFromFile("ceil_2.jpg", "Textures/");
-	tmpTexture.path = "ceil_2.jpg";
-	tmpTexture.type = "texture_diffuse";
-	textures[5].push_back(tmpTexture);
-	tmpTexture.id = TextureFromFile("pillar_1.png", "Textures/");
-	tmpTexture.path = "pillar_1.png";
-	tmpTexture.type = "texture_diffuse";
-	textures[6].push_back(tmpTexture);
+	for (int i = 0; i < 7; ++i) {
+		tmpTexture.id = TextureFromFile(textureNames[i].c_str(), "Textures/");
+		tmpTexture.path = textureNames[i].c_str();
+		tmpTexture.type = "texture_diffuse";
+		textures[i].push_back(tmpTexture);
+	}
 	inFile.close();
 	for (int i = 0; i < 7; ++i) {
 		Mesh mesh(vertices[i], indices[i], textures[i]);

@@ -43,6 +43,7 @@ public:
 	void initialize();
 	void setPortal(int portal_type, glm::vec3 pos, glm::vec3 n, glm::vec3 up);
 	void Draw(Shader shader);
+	void DrawSingle(Shader shader, int id);
 
 	float passPortal(glm::vec3 &pos, glm::vec3 &v, glm::vec3 keyV, glm::vec3 cameraFront, float deltaTime, bool &isPass);
 

@@ -7,7 +7,7 @@ uniform sampler2D texture_diffuse;
 
 void main() {
     vec4 texColor = texture(texture_diffuse, TexCoords);
-	if (texColor.a < 0.1 || texColor.a > 0.95) {
+	if (texColor.a < 1.0) {
 		discard;
 	}
 	FragColor = texColor;

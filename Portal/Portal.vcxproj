@@ -162,6 +162,10 @@
     <None Include="shader_cross.vs" />
     <None Include="shader_portal.fs" />
     <None Include="shader_portal.vs" />
+    <None Include="shader_portal_inside.fs" />
+    <None Include="shader_portal_inside.vs" />
+    <None Include="shader_portal_mask.fs" />
+    <None Include="shader_portal_mask.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />

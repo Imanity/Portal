@@ -75,6 +75,15 @@ void Portal::Draw(Shader shader) {
 	}
 }
 
+void Portal::DrawSingle(Shader shader, int id) {
+	if (id == 0) {
+		bluePortals[0].Draw(shader);
+	}
+	else {
+		orangePortals[0].Draw(shader);
+	}
+}
+
 float Portal::passPortal(glm::vec3 &pos, glm::vec3 &v, glm::vec3 keyV, glm::vec3 cameraFront, float deltaTime, bool &isPass) {
 	isPass = false;
 	if (!bluePortalExist || !orangePortalExist) {
