@@ -39,7 +39,7 @@ float lastFrame = 0.0f;
 glm::vec3 speed = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 keyboardSpeed = glm::vec3(0.0f, 0.0f, 0.0f);
 bool isJumping = false;
-Physics physics("Map2.txt", glm::vec3(0.0f, 0.0f, 1.0f));
+Physics physics("Map3.txt", glm::vec3(0.0f, 0.0f, 1.0f));
 glm::vec3 playerSize = glm::vec3(0.0f, 0.0f, 2.0f);
 glm::vec3 playerPos, cameraPos;
 
@@ -82,7 +82,7 @@ int main() {
 	Shader shaderPortalInside("shader_portal_inside.vs", "shader_portal_inside.fs");
 	Shader shaderPortalMask("shader_portal_mask.vs", "shader_portal_mask.fs");
 
-	Model scene("Map2.txt");
+	Model scene("Map3.txt");
 	Model crossHairs("Map_cross.txt");
 	
 	portal.initialize();
