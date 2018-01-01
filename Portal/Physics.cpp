@@ -1,6 +1,6 @@
 #include "Physics.h"
 
-Physics::Physics(string const &path, glm::vec3 up) {
+Physics::Physics(string const &path, string const &winPath, glm::vec3 up) {
 	worldUp = up;
 	ifstream inFile(path);
 	if (!inFile) {
@@ -68,6 +68,15 @@ Physics::Physics(string const &path, glm::vec3 up) {
 		}
 	}
 	inFile.close();
+	ifstream winFile(winPath);
+	if (!winFile) {
+		std::cout << "Map failed to load at path: " << winPath << std::endl;
+		return;
+	}
+	float x, y, z;
+	winFile >> x >> y >> z;
+	winFile.close();
+	winPoint = glm::vec3(x, y, z);
 }
 
 Physics::~Physics() {
@@ -237,4 +246,9 @@ bool Physics::isWallWhite(int x, int y) {
 		}
 	}
 	return false;
+}
+
+bool Physics::isWin(glm::vec3 &pos) {
+	float dis = glm::distance(pos, winPoint);
+	return (dis < 2.0f);
 }

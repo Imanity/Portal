@@ -19,6 +19,9 @@
     <Filter Include="资源文件\Maps">
       <UniqueIdentifier>{dc0cf704-619e-4572-b52c-8fbcb5722bb4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="资源文件\WinPos">
+      <UniqueIdentifier>{4e043102-2412-4fd2-96ba-00c1a64647d2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -80,6 +83,12 @@
     <None Include="shader_portal_mask.vs">
       <Filter>源文件\Shader</Filter>
     </None>
+    <None Include="shader_hint.fs">
+      <Filter>源文件\Shader</Filter>
+    </None>
+    <None Include="shader_hint.vs">
+      <Filter>源文件\Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -109,6 +118,18 @@
       <Filter>资源文件\Maps</Filter>
     </Text>
     <Text Include="Map_cross.txt">
+      <Filter>资源文件\Maps</Filter>
+    </Text>
+    <Text Include="Map3.txt">
+      <Filter>资源文件\Maps</Filter>
+    </Text>
+    <Text Include="Map4.txt">
+      <Filter>资源文件\Maps</Filter>
+    </Text>
+    <Text Include="Win4.txt">
+      <Filter>资源文件\WinPos</Filter>
+    </Text>
+    <Text Include="Map_pass.txt">
       <Filter>资源文件\Maps</Filter>
     </Text>
   </ItemGroup>

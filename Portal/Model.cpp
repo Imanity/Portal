@@ -207,7 +207,7 @@ void Model::loadMap(string const &path) {
 		std::cout << "Map failed to load at path: " << path << std::endl;
 		return;
 	}
-	int id[7] = { 0, 0, 0, 0, 0, 0, 0 };
+	int id[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 	vector<Vertex> vertices[7];
 	vector<unsigned int> indices[7];
 	vector<Texture> textures[7];

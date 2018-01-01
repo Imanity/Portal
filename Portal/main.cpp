@@ -39,7 +39,7 @@ float lastFrame = 0.0f;
 glm::vec3 speed = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 keyboardSpeed = glm::vec3(0.0f, 0.0f, 0.0f);
 bool isJumping = false;
-Physics physics("Map3.txt", glm::vec3(0.0f, 0.0f, 1.0f));
+Physics physics("Map4.txt", "Win4.txt", glm::vec3(0.0f, 0.0f, 1.0f));
 glm::vec3 playerSize = glm::vec3(0.0f, 0.0f, 2.0f);
 glm::vec3 playerPos, cameraPos;
 
@@ -81,11 +81,14 @@ int main() {
 	Shader shaderPortal("shader_portal.vs", "shader_portal.fs");
 	Shader shaderPortalInside("shader_portal_inside.vs", "shader_portal_inside.fs");
 	Shader shaderPortalMask("shader_portal_mask.vs", "shader_portal_mask.fs");
+	Shader shaderHint("shader_hint.vs", "shader_hint.fs");
 
-	Model scene("Map3.txt");
+	Model scene("Map4.txt");
 	Model crossHairs("Map_cross.txt");
 	
 	portal.initialize();
+
+	bool isWin = false;
 
 	// render loop
 	// -----------
@@ -96,9 +99,18 @@ int main() {
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
+		// Show hint if win
+		// ------
+		//if (isWin) {
+			
+		//}
+
 		// Update state
 		// ------
 		playerPos = camera.Position - playerSize;
+		if (physics.isWin(playerPos)) {
+			isWin = true;
+		}
 		physics.updateVerticleState(speed, playerPos, deltaTime, isJumping);
 		camera.Position = playerSize + playerPos;
 		

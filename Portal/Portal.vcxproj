@@ -48,7 +48,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -160,6 +160,8 @@
     <None Include="shader.vs" />
     <None Include="shader_cross.fs" />
     <None Include="shader_cross.vs" />
+    <None Include="shader_hint.fs" />
+    <None Include="shader_hint.vs" />
     <None Include="shader_portal.fs" />
     <None Include="shader_portal.vs" />
     <None Include="shader_portal_inside.fs" />
@@ -178,7 +180,11 @@
   <ItemGroup>
     <Text Include="Map1.txt" />
     <Text Include="Map2.txt" />
+    <Text Include="Map3.txt" />
+    <Text Include="Map4.txt" />
     <Text Include="Map_cross.txt" />
+    <Text Include="Map_pass.txt" />
+    <Text Include="Win4.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
